@@ -32,37 +32,46 @@ para que lo tome phonegap build agregar al config.xml la siguiente linea
 
             
         <div id="contenedor"> 
-            <form class="form-signin" role="form">
-                <h2 class="form-signin-heading">Favor Ingresa</h2>
-                <label for="inputEmail" class="sr-only">Correo electrónico </label>
-                <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
-                <label for="inputPassword" class="sr-only">Contraseña</label>
-                <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
-                <div class="checkbox">
-                  <label>
-                    <input type="checkbox" value="remember-me"> No cerrar sessión
-                  </label>
-                </div>
-                <button id="signin" class="btn btn-lg btn-primary btn-block" type="submit">Iniciar Sesión</button>
-            </form>
 
-            <div id="map"> </div><!-- vista principal --> 
-            <div >
-                <button class="menu" ></button>
+            <div id="btn2" class="derecha">
+                <button class="menu1" > eee </button>
             </div>
+
+            <!-- FORMULARIO INGRESAR -->
+            <div  id="formIngresar" class="form-signin pageLogin" role="form"> <!-- puse role="form" al div pero seria igual-->
+                <!-- <form class="form-signin" role="form"> -->
+                    <h2 id="h2Ingresar" class="form-signin-heading"> Ingresar </h2>
+                    <label for="inputEmail" class="sr-only">Correo electrónico </label>
+                    <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+                    <label for="inputPassword" class="sr-only">Contraseña</label>
+                    <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
+                    <div class="checkbox">
+                      <label>
+                        <input type="checkbox" id="nocerrar" value="remember-me"> No cerrar sessión
+                      </label>
+                    </div>
+                <button id="login" class="btn btn-lg btn-primary btn-block" >Iniciar Sesión</button> 
+                <!-- </form> -->
+                <!-- 1) saco form y meto un div porque el form recarga la pagina
+                     2) sabo el tag button fuera del form
+                -->
+            </div>
+            <!-- MAPA  -->
+            <div id="map" class="mapFondo" > </div><!-- vista principal --> 
+            
+
+
             <div id="deviceready" class="blink">
                 <p class="event listening">Connecting to Device</p>
                 <p class="event received">Device is Ready</p>
             </div>
+            
             <div id="loading">
                 <img src="img/loading.gif">
             </div>
             
 
 
-            <!-- <div id="btn2">
-                <button class="menu1" ></button>
-            </div> -->
             
             <!-- <div id="loading">
               <img src="img/loading.gif" class="ajax-loader">
@@ -103,7 +112,7 @@ para que lo tome phonegap build agregar al config.xml la siguiente linea
             </div> -->
 
         
-        </div> 
+        </div> <!-- termina contenedor  -->
 <!--
         <div id="sqlite" class="content">
             <div class="input-area ch30">

@@ -19,6 +19,7 @@ var app = {
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
         //app.receivedEvent('deviceready');
+
         app.getLocation();
         app.seePosition();
         app.mandarJquery();
@@ -27,6 +28,7 @@ var app = {
         var pushNotification = window.plugins.pushNotification;
         pushNotification.register(app.successHandler, app.errorHandler,{"senderID":"466388852109","ecb":"app.onNotificationGCM"});
     
+        
     //estas lineas son las que serian la function init del ejemplo sqlite
         //navigator.splashscreen.hide(); la saque porque explota
         
@@ -134,8 +136,10 @@ var app = {
             case 'registered':
                 if ( e.regid.length > 0 )
                 {
+                    app.regid = e.regid;
                     console.log("Regid " + e.regid);
-        //            alert('registration id = '+e.regid);
+                    alert('registration id = '+e.regid);
+                    
                 }
             break;
  
@@ -221,19 +225,60 @@ var app = {
 
     mandarJquery: function(){
         $(document).ready(function() {
+            //$("#formIngresar").addClass("pageLogin");
+            var appRegId = app.regid;
+            function terminoRegid(){
+                alert('termino');
+            }
+            function esperarRegid(terminoRegid){
+                while(appRegId===null){
+                    appRegId = app.regid;
+                }
+            }
+            
             $("#loading").addClass("novisible");
             $("#deviceready").addClass("novisible");
-
             $("#viewrest").addClass("novisible");
+            $("#btn2").addClass("novisible");
+            
+            $( ".menu").addClass("novisible");
             //var viewrest = document.getElementById("viewrest");
             //viewrest.style.display = "none";
             function mandarderecha(){
                 $("#sqlite").addClass("derecha");
             }
 
-            $( "#signin").click(function(){
-                alert('voy a llamar a login');
+            // login de rescatista
+            $( "#login").click(function(){
+
+
+                var email = document.getElementById("inputEmail").value;
+                var password = document.getElementById("inputPassword").value;
+                var n = $( "input:checked" ).length; // si n = 1 , entonces no cerrar sesion
+                //alert("email " + email + " /n password" + password + " /n nocerrar " + n);
+                alert("app.regid " + app.regid);
+                
+               
+                //$("#formIngresar").addClass("derecha");
+
+                //var mapa = document.getElementById("map");
+                //mapa.style.display = "none";
+                //$("h2.form-signin-heading").addClass("derecha");
+                //$( "#formIngresar").children().addClass("derecha");
+                //$("#formIngresar").addClass("novisible");
             });
+            
+
+            $( "#btn2").click(function(){
+                //alert("hola");
+                //var mapa = document.getElementById("map");
+                //mapa.style.display = "none";
+                $("#map").addClass("derecha");
+
+                //$("#formIngresar").addClass("derecha");
+                //$("#formIngresar").addClass("novisible");
+            });
+
 
             $( ".menu").click(function(){
                 mandarderecha();
@@ -261,8 +306,9 @@ var app = {
                   success: success
                 });
                 */
-                var idUsuario = document.getElementById("inputEmail3").value;
-                var password = document.getElementById("inputPassword3").value;
+
+                //var idUsuario = document.getElementById("inputEmail3").value;
+                //var password = document.getElementById("inputPassword3").value;
                 //var idUsuario = $("#inputEmail3").val();
                 
                 //var urljson = "http://192.168.43.166:8080/catastrophes-system-web/rest/ServicesUsuario/alta/"+idUsuario+"/"+password;
@@ -314,6 +360,8 @@ var app = {
     
     
 };
+
+app.regid = null;
 
 // del ejemplo sqlite
 app.db = null;
