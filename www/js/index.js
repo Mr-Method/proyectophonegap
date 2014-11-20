@@ -19,22 +19,28 @@ var app = {
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
         //app.receivedEvent('deviceready');
-
+        app.openDb();
+        app.checkSesion();
         app.getLocation();
         app.seePosition();
         app.mandarJquery();
-
+        
         app.receivedEvent('deviceready');
         var pushNotification = window.plugins.pushNotification;
         pushNotification.register(app.successHandler, app.errorHandler,{"senderID":"466388852109","ecb":"app.onNotificationGCM"});
     
         
-    //estas lineas son las que serian la function init del ejemplo sqlite
+        //estas lineas son las que serian la function init del ejemplo sqlite
         //navigator.splashscreen.hide(); la saque porque explota
-        
+        //---> base local sqlite
         //app.openDb();
-        //app.createTable();
-        //app.refresh();
+        app.createTable();
+        app.refresh();
+
+        //app.checkSesion();
+        alert('chequeo: ' + chequeo + ' / app.email: ' + app.email);
+
+        
 
 
     },
@@ -136,9 +142,10 @@ var app = {
             case 'registered':
                 if ( e.regid.length > 0 )
                 {
+                    //asigno a la app el regid obtenido
                     app.regid = e.regid;
-                    console.log("Regid " + e.regid);
-                    alert('registration id = '+e.regid);
+                    console.log("lgh Regid " + e.regid);
+                    //alert('registration id = '+e.regid);
                     
                 }
             break;
@@ -223,19 +230,77 @@ var app = {
         var watchID = navigator.geolocation.watchPosition(onSuccess, onError, { timeout: 30000 });
     },
 
+    checkSesion: function(){
+    var db = app.db;
+    var mostrarEmail = function (tx, rs) {
+        //var retorno = null;
+            for (var i = 0; i < rs.rows.length; i++) {
+                app.email = rs.rows.item(i).email;
+                alert('retorno ' + retorno);
+                //app.email = retorno;
+            }
+            
+            //return retorno;
+        }
+
+        db.transaction(function(tx) {
+            tx.executeSql("SELECT * FROM email", [], 
+                          mostrarEmail, 
+                          app.onError);
+        });
+
+    },
+
+    addSesion: function(email) {
+        var db = app.db;
+        //delete de tabla email
+        db.transaction(function(tx) {
+            tx.executeSql("DELETE FROM email ", [],
+                          app.onSuccess,
+                          app.onError);
+        });
+        //creo la tabla email
+        db.transaction(function(tx) {
+            tx.executeSql("CREATE TABLE IF NOT EXISTS email(ID INTEGER PRIMARY KEY ASC, email TEXT, added_on DATETIME)", []);
+        });
+        //insert registro en email
+        db.transaction(function(tx) {
+            var addedOn = new Date();
+            tx.executeSql("INSERT INTO email(email, added_on) VALUES (?,?)",
+                          [email, addedOn],
+                          app.onSuccess,
+                          app.onError);
+        });
+
+        var mostrarEmail = function (tx, rs) {
+            for (var i = 0; i < rs.rows.length; i++) {
+                alert('el select en i: '+ i +' '+ rs.rows.item(i).email);
+            }
+        }
+
+        db.transaction(function(tx) {
+            tx.executeSql("SELECT * FROM email", [], 
+                          mostrarEmail, 
+                          app.onError);
+        });
+
+    },
+    noCerrar: function(noCerrarSesion, email){
+        alert('testf , noCerrarSesion: ' + noCerrarSesion);
+        if(noCerrarSesion===1){
+            alert('clavo registro');
+            app.addSesion(email);
+        }
+    },
+
     mandarJquery: function(){
         $(document).ready(function() {
             //$("#formIngresar").addClass("pageLogin");
-            var appRegId = app.regid;
-            function terminoRegid(){
-                alert('termino');
-            }
-            function esperarRegid(terminoRegid){
-                while(appRegId===null){
-                    appRegId = app.regid;
-                }
-            }
+            //var email
             
+
+            alert('en mandar jquery, app.email: ' + app.email);
+
             $("#loading").addClass("novisible");
             $("#deviceready").addClass("novisible");
             $("#viewrest").addClass("novisible");
@@ -254,10 +319,11 @@ var app = {
 
                 var email = document.getElementById("inputEmail").value;
                 var password = document.getElementById("inputPassword").value;
-                var n = $( "input:checked" ).length; // si n = 1 , entonces no cerrar sesion
-                //alert("email " + email + " /n password" + password + " /n nocerrar " + n);
-                alert("app.regid " + app.regid);
+                var noCerrarSesion = $( "input:checked" ).length; // si n = 1 , entonces no cerrar sesion
+                //alert("email: " + email + " ,password: " + password + " ,nocerrar: " + noCerrarSesion);
+                //alert("app.regid " + app.regid);
                 
+                app.noCerrar(noCerrarSesion,email);
                 //$("#formIngresar").addClass("derecha");
 
                 //var mapa = document.getElementById("map");
@@ -359,6 +425,8 @@ var app = {
     
     
 };
+
+app.email = null; // sesion
 
 app.regid = null;
 
