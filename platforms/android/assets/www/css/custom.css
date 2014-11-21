@@ -12,9 +12,7 @@
     /*z-index: -1;*/
 	width:100%;
 	height:100%;
-	opacity: 50%;
 }
-
 #boton {
 	position: relative;
     /*left: -20px;*/
@@ -29,8 +27,8 @@
 }
 
 .mapFondo{
-	z-index: -1;
-	opacity: 50%;
+	z-index: -2;
+	opacity: 0.1;
 }
 
 .menu{
@@ -144,6 +142,7 @@
 	/*display:block;*/
 	margin-left: 50%;
 	margin-top: 50%;
+	z-index: 100;
 }
 .ajax-loader {
   position: absolute;
@@ -165,5 +164,15 @@
 	-moz-transform: rotate(-360deg);
 	-o-transform: rotate(-360deg);
 	transform: rotate(-360deg);
+}
+
+#efectomap{
+	position: relative;
+    background-color: #3D0014;
+ 	width:100%;
+	height:100%;
+	background-color: green;
+	opacity: 0.3;
+	z-index: -1;
 }
 */

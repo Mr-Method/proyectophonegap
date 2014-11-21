@@ -11,7 +11,13 @@ var app = {
     // 'load', 'deviceready', 'offline', and 'online'.
     bindEvents: function() {
         document.addEventListener('deviceready', this.onDeviceReady, false);
+        document.addEventListener("menubutton", this.menu, false);
+
         //document.addEventListener('deviceready', init, false);
+
+    },
+    menu: function(){
+        alert('apreto el menu');
     },
     // deviceready Event Handler
     //
@@ -19,26 +25,27 @@ var app = {
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
         //app.receivedEvent('deviceready');
-        app.openDb();
-        app.checkSesion();
         app.getLocation();
-        app.seePosition();
-        app.mandarJquery();
+        //app.seePosition();
+        app.openDb();
+        app.createTable();
+        app.refresh();
+        app.checkSesion();
+        //app.checkSesion();
+
         
         app.receivedEvent('deviceready');
         var pushNotification = window.plugins.pushNotification;
         pushNotification.register(app.successHandler, app.errorHandler,{"senderID":"466388852109","ecb":"app.onNotificationGCM"});
     
         
+        //app.mandarJquery();
+        
         //estas lineas son las que serian la function init del ejemplo sqlite
         //navigator.splashscreen.hide(); la saque porque explota
         //---> base local sqlite
-        //app.openDb();
-        app.createTable();
-        app.refresh();
-
-        //app.checkSesion();
-        alert('chequeo: ' + chequeo + ' / app.email: ' + app.email);
+        
+        //alert('chequeo: ' + chequeo + ' / app.email: ' + app.email);
 
         
 
@@ -74,6 +81,10 @@ var app = {
         var db = app.db;
         db.transaction(function(tx) {
             tx.executeSql("CREATE TABLE IF NOT EXISTS todo(ID INTEGER PRIMARY KEY ASC, todo TEXT, added_on DATETIME)", []);
+        });
+        //creo la tabla email
+        db.transaction(function(tx) {
+            tx.executeSql("CREATE TABLE IF NOT EXISTS email(ID INTEGER PRIMARY KEY ASC, email TEXT, added_on DATETIME)", []);
         });
     },
 
@@ -128,6 +139,30 @@ var app = {
         });
     },
 
+    checkSesion: function(callback){
+     var mostrarEmail = function (tx, rs) {
+        var retorno = null;
+            for (var i = 0; i < rs.rows.length; i++) {
+                app.email = rs.rows.item(i).email;
+                retorno = rs.rows.item(i).email;
+            }
+        //document.getElementById("sesion").value(retorno);
+        if(retorno!=null)
+        app.mandarJquery(retorno);
+
+        }
+        
+        var db = app.db;
+        db.transaction(function(tx) {
+            tx.executeSql("SELECT * FROM email", [], 
+                          mostrarEmail, 
+                          app.onError);
+        });
+
+    //return retorno;
+
+    },
+
     // result contains any message sent from the plugin call
     successHandler: function(result) {
         //alert('Callback Success! Result = '+result)
@@ -145,8 +180,6 @@ var app = {
                     //asigno a la app el regid obtenido
                     app.regid = e.regid;
                     console.log("lgh Regid " + e.regid);
-                    //alert('registration id = '+e.regid);
-                    
                 }
             break;
  
@@ -171,7 +204,6 @@ var app = {
         var onSuccess = function(position) { // es el codigo de la funcion leaflet
             var lat = position.coords.latitude;
             var lon = position.coords.longitude;
-            
             var map = L.map('map').setView([lat, lon], 13);
             // add an OpenStreetMap tile layer
             L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
@@ -185,11 +217,12 @@ var app = {
         };
 
         // onError Callback receives a PositionError object
-        //
         function onError(error) {
-            console.log('code: '    + error.code    + '\n' +
+            //console.log('en getLocation code: '    + error.code    + '\n' +
+            alert('en getLocation code: '    + error.code    + '\n' +
                   'message: ' + error.message + '\n');
         }
+
         navigator.geolocation.getCurrentPosition(onSuccess, onError);
     },
     
@@ -221,34 +254,13 @@ var app = {
         // onError Callback receives a PositionError object
         //
         function onError(error) {
-            alert('code: '    + error.code    + '\n' +
+            alert('on error seeposition code: '    + error.code    + '\n' +
                   'message: ' + error.message + '\n');
         }
 
         // Options: throw an error if no update is received every 30 seconds.
         //
         var watchID = navigator.geolocation.watchPosition(onSuccess, onError, { timeout: 30000 });
-    },
-
-    checkSesion: function(){
-    var db = app.db;
-    var mostrarEmail = function (tx, rs) {
-        //var retorno = null;
-            for (var i = 0; i < rs.rows.length; i++) {
-                app.email = rs.rows.item(i).email;
-                alert('retorno ' + retorno);
-                //app.email = retorno;
-            }
-            
-            //return retorno;
-        }
-
-        db.transaction(function(tx) {
-            tx.executeSql("SELECT * FROM email", [], 
-                          mostrarEmail, 
-                          app.onError);
-        });
-
     },
 
     addSesion: function(email) {
@@ -293,14 +305,15 @@ var app = {
         }
     },
 
-    mandarJquery: function(){
+    mandarJquery: function(retorno){
+        //alert('retorno 1 '+ retorno);
+
         $(document).ready(function() {
+          //  alert('retorno 2 '+ retorno);
+            if(retorno!=null)
+                $("#formIngresar").addClass("derecha");
+
             //$("#formIngresar").addClass("pageLogin");
-            //var email
-            
-
-            alert('en mandar jquery, app.email: ' + app.email);
-
             $("#loading").addClass("novisible");
             $("#deviceready").addClass("novisible");
             $("#viewrest").addClass("novisible");
@@ -416,9 +429,7 @@ var app = {
 
                 //$(".content").addClass(className)
 
-            });// end - $( ".menu").click(function(){
-            
-
+            });// end - callrest
 
         });// end - $(document).ready
     }

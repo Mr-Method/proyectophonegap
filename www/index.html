@@ -38,7 +38,7 @@ para que lo tome phonegap build agregar al config.xml la siguiente linea
             </div>
 
             <!-- FORMULARIO INGRESAR -->
-            <div  id="formIngresar" class="form-signin pageLogin" role="form"> <!-- puse role="form" al div pero seria igual-->
+            <div  id="formIngresar" class="form-signin pageLogin novisible" role="form"> <!-- puse role="form" al div pero seria igual-->
                 <!-- <form class="form-signin" role="form"> -->
                     <h2 id="h2Ingresar" class="form-signin-heading"> Ingresar </h2>
                     <label for="inputEmail" class="sr-only">Correo electrónico </label>
@@ -57,11 +57,12 @@ para que lo tome phonegap build agregar al config.xml la siguiente linea
                 -->
             </div>
             <!-- MAPA  -->
-            <div id="map" class="mapFondo" > </div><!-- vista principal --> 
-            
+            <div id="map" class="mapFondo" ></div><!-- vista principal --> 
+            <!-- <div id="efectomap">
+            </div> -->
 
 
-            <div id="deviceready" class="blink">
+            <div id="deviceready" class="blink novisible">
                 <p class="event listening">Connecting to Device</p>
                 <p class="event received">Device is Ready</p>
             </div>
@@ -114,6 +115,7 @@ para que lo tome phonegap build agregar al config.xml la siguiente linea
         
         </div> <!-- termina contenedor  -->
 
+<!-- div sqlite
         <div id="sqlite" class="content">
             <div class="input-area ch30">
                 <input class="inputBox" type="text" id="todo" placeholder="Add New Item" />
@@ -127,8 +129,7 @@ para que lo tome phonegap build agregar al config.xml la siguiente linea
                 <div class="separator"></div>
             </div> 
         </div>
-
-        
+-->
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" src="leaflet/leaflet.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
