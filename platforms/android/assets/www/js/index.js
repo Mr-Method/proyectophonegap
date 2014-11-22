@@ -11,6 +11,7 @@ var app = {
     // 'load', 'deviceready', 'offline', and 'online'.
     bindEvents: function() {
         document.addEventListener('deviceready', this.onDeviceReady, false);
+        //document.addEventListener('deviceready', this.onDeviceReady, false);
         document.addEventListener("menubutton", this.menu, false);
 
         //document.addEventListener('deviceready', init, false);
@@ -25,6 +26,8 @@ var app = {
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
         //app.receivedEvent('deviceready');
+        
+
         app.getLocation();
         //app.seePosition();
         app.openDb();
@@ -63,6 +66,13 @@ var app = {
         console.log('Received Event: ' + id);
 
         
+    },
+
+    lanzarSesion: function(){
+        $('#load').addClass("delete");
+        $('#map').removeClass("mapFondo");
+        
+            
     },
 
     openDb: function() {
@@ -146,6 +156,9 @@ var app = {
                 app.email = rs.rows.item(i).email;
                 retorno = rs.rows.item(i).email;
             }
+
+        app.lanzarSesion();
+
         //document.getElementById("sesion").value(retorno);
         if(retorno!=null)
         app.mandarJquery(retorno);
@@ -312,6 +325,10 @@ var app = {
           //  alert('retorno 2 '+ retorno);
             if(retorno!=null)
                 $("#formIngresar").addClass("derecha");
+
+            // menu
+            $('.navmenu').offcanvas()
+
 
             //$("#formIngresar").addClass("pageLogin");
             $("#loading").addClass("novisible");

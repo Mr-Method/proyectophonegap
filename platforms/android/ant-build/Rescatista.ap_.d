@@ -107,12 +107,15 @@
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/res/screen/android/screen-hdpi-landscape.png \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/res/screen/android/screen-xhdpi-portrait.png \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/res/screen/android/screen-hdpi-portrait.png \
+/home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/css/jasny-bootstrap.min.css \
+/home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/css/navmenu-push.css \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/css/signin.css \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/css/index.css \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/css/bootstrap-theme.css \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/css/bootstrap.css \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/css/custom.css \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/img/loading.gif \
+/home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/img/load.png \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/spec/lib \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/spec/index.js \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/spec/helper.js \
@@ -121,6 +124,7 @@
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/spec/lib/jasmine-1.2.0/jasmine.js \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/spec/lib/jasmine-1.2.0/MIT.LICENSE \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/spec/lib/jasmine-1.2.0/jasmine-html.js \
+/home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/js/jasny-bootstrap.min.js \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/js/fastclick.js \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/js/index.js \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/js/node_modules \
