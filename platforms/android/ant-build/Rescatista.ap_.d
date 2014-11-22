@@ -37,9 +37,9 @@
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/iconorigin.png \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/cordova.js \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/js \
-/home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/icon.png \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/index.html \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/leaflet \
+/home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/icono.png \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/phonegap.js \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/styles \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/141118index.html \

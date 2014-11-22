@@ -69,9 +69,19 @@ var app = {
     },
 
     lanzarSesion: function(){
+        //quito la imagen de load
         $('#load').addClass("delete");
-        $('#map').removeClass("mapFondo");
-        
+
+        if(app.email ==null){ // no hay sesion
+            $('#map').addClass("mapFondo");
+            $('#menuboton').addClass("novisible");
+        }
+        else{
+            
+            $('#map').removeClass("mapFondo");
+        }
+
+        //app.mandarJquery();
             
     },
 
@@ -157,12 +167,15 @@ var app = {
                 retorno = rs.rows.item(i).email;
             }
 
-        app.lanzarSesion();
+        console.log('lgh retorno: ' + retorno);
 
+        app.email = retorno;
+        
+        app.lanzarSesion(); //chquea si hay sesion inicia o no y en base a eso renderiza
         //document.getElementById("sesion").value(retorno);
-        if(retorno!=null)
-        app.mandarJquery(retorno);
-
+        
+        // mando las acciones a los distintos botones o divs
+        app.mandarJquery();
         }
         
         var db = app.db;
@@ -171,9 +184,19 @@ var app = {
                           mostrarEmail, 
                           app.onError);
         });
+    },
 
-    //return retorno;
-
+    cerrarSesion: function(){
+        var salir = function(){
+            navigator.app.exitApp();
+        }
+        
+        var db = app.db;
+        db.transaction(function(tx) {
+            tx.executeSql("DELETE FROM email", [], 
+                          salir,
+                          app.onError);
+        });
     },
 
     // result contains any message sent from the plugin call
@@ -311,23 +334,19 @@ var app = {
 
     },
     noCerrar: function(noCerrarSesion, email){
-        alert('testf , noCerrarSesion: ' + noCerrarSesion);
+        //alert('testf , noCerrarSesion: ' + noCerrarSesion);
         if(noCerrarSesion===1){
-            alert('clavo registro');
+          //  alert('clavo registro');
             app.addSesion(email);
         }
     },
 
-    mandarJquery: function(retorno){
-        //alert('retorno 1 '+ retorno);
+    mandarJquery: function(){
+        //alert('retorno 1 ');
 
         $(document).ready(function() {
-          //  alert('retorno 2 '+ retorno);
-            if(retorno!=null)
-                $("#formIngresar").addClass("derecha");
-
-            // menu
-            $('.navmenu').offcanvas()
+            // menu 
+            //$('.navmenu').offcanvas()
 
 
             //$("#formIngresar").addClass("pageLogin");
@@ -343,19 +362,50 @@ var app = {
                 $("#sqlite").addClass("derecha");
             }
 
+            // menu / acciones
+            $( "#aSalir").click(function(){
+                navigator.app.exitApp();
+            });
+            $( "#aCerrarSesion").click(function(){
+                app.cerrarSesion();
+                //navigator.app.exitApp();
+            });
+
+             $( "#aRetorno").click(function(parmretorno, retorno){
+                alert('parmretorno: ' + parmretorno + ' retorno: ' + retorno + ' app.email: ' + app.email);
+                //navigator.app.exitApp();
+            }); 
+
+
             // login de rescatista
             $( "#login").click(function(){
 
 
-                var email = document.getElementById("inputEmail").value;
-                var password = document.getElementById("inputPassword").value;
-                var noCerrarSesion = $( "input:checked" ).length; // si n = 1 , entonces no cerrar sesion
-                //alert("email: " + email + " ,password: " + password + " ,nocerrar: " + noCerrarSesion);
+                // var email = document.getElementById("inputEmail").value;
+                // var password = document.getElementById("inputPassword").value;
+                // var noCerrarSesion = $( "input:checked" ).length; // si n = 1 , entonces no cerrar sesion
+                // alert("email: " + email + " ,password: " + password + " ,nocerrar: " + noCerrarSesion);
                 //alert("app.regid " + app.regid);
                 
-                app.noCerrar(noCerrarSesion,email);
-                //$("#formIngresar").addClass("derecha");
 
+                // var urljson = "http://172.16.108.196:8080/catastrophes-system-web/rest/ServicesUsuario/get";
+                // $.getJSON(urljson , function( data ) {
+                //   //alert("user: " + data.User + "password: "+ data.password);
+                //   alert(data);
+                //   console.log("lgh 2" + data);
+                // });
+
+                $.ajax({
+                    url: "http://172.16.108.196:8080/catastrophes-system-web/rest/ServicesUsuario/get"
+                }).then(function(data) {
+                    console.log('lgh en llamoRest dentro del .then');
+                    alert(data);
+                });
+
+                //app.noCerrar(noCerrarSesion,email);
+                
+
+                //$("#formIngresar").addClass("derecha");
                 //var mapa = document.getElementById("map");
                 //mapa.style.display = "none";
                 //$("h2.form-signin-heading").addClass("derecha");
@@ -449,7 +499,8 @@ var app = {
             });// end - callrest
 
         });// end - $(document).ready
-    }
+    
+    }// end mandarJquery
     
     
 };
