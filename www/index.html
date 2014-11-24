@@ -31,15 +31,14 @@ para que lo tome phonegap build agregar al config.xml la siguiente linea
         
     </head>
     <body>
-
-        <div style="left: 0px; right: 1001px;" class="navmenu navmenu-default navmenu-fixed-left offcanvas canvas-slid">
+        <!-- menu -->
+        <div id="menuoffcanvas" style="left: 0px; right: 1001px;" class="navmenu navmenu-default navmenu-fixed-left offcanvas canvas-slid">
           <a class="navmenu-brand" href="#">Rescatista </a>
           <ul class="nav navmenu-nav">
             <li><a id="aSalir">Salir </a></li>
-            <li class="active"><a >Push</a></li>
             <li><a id="aCerrarSesion">Cerrar Sesion</a></li>
-            <li><a id="aRetorno">Test retorno</a></li>
-            <li><a >Off canvas navbar</a></li>
+            <li><a id="aRetorno">Test llamada </a></li>
+            <li class="active"><a id="aCatastrofes">Catástrofes</a></li>
           </ul>
           <ul class="nav navmenu-nav">
             <li><a >Link</a></li>
@@ -60,25 +59,21 @@ para que lo tome phonegap build agregar al config.xml la siguiente linea
           </ul>
         </div>
 
-<div id="menuboton" class="canvas" style="">    
-        <div class="navbar navbar-default navbar-fixed-top">
-          <button class="navbar-toggle" data-canvas="body" data-target=".navmenu" data-toggle="offcanvas" type="button">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
+        <div id="menuboton" class="canvas novisible" style="">    
+                <div class="navbar navbar-default navbar-fixed-top">
+                  <button class="navbar-toggle" data-canvas="body" data-target=".navmenu" data-toggle="offcanvas" type="button">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                  </button>
+                </div>
         </div>
-</div>
+
         <div id="contenedor"> 
-
-
-            <div id="btn2" class="derecha">
-                <button class="menu1" > eee </button>
-            </div>
 
             <!-- FORMULARIO INGRESAR -->
             <div  id="formIngresar" class="form-signin pageLogin " role="form"> <!-- puse role="form" al div pero seria igual-->
-                <!-- <form class="form-signin" role="form"> -->
+                <!-- <form class="form-signin" role="form">  -->
                     <h2 id="h2Ingresar" class="form-signin-heading"> Ingresar </h2>
                     <label for="inputEmail" class="sr-only">Correo electrónico </label>
                     <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
@@ -158,21 +153,22 @@ para que lo tome phonegap build agregar al config.xml la siguiente linea
         </div> <!-- termina contenedor  -->
     </div> <!-- termina page wrapper  -->
 
-<!-- div sqlite
-        <div id="sqlite" class="content">
-            <div class="input-area ch30">
+<!-- div sqlite -->
+        <div id="sqlite" class="content novisible">
+            <!-- <div class="input-area ch30">
                 <input class="inputBox" type="text" id="todo" placeholder="Add New Item" />
                 <button class="button" id="addButton" onclick="addTodo(); return false;">Add</button>
-            </div>
+            </div> -->
+
             <div class="result-area ch70">
                 <div class="results">
-                    <div class="desc">Todo List:</div>
+                    <!-- <div class="desc">Todo List:</div> -->
                     <ul id="todoItems"></ul>
                 </div>
                 <div class="separator"></div>
             </div> 
         </div>
--->
+
         <script type="text/javascript" src="cordova.js"></script>
         <script type="text/javascript" src="leaflet/leaflet.js"></script>
         <script type="text/javascript" src="js/index.js"></script>

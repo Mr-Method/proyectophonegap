@@ -32,6 +32,11 @@ var app = {
         //app.seePosition();
         app.openDb();
         app.createTable();
+
+        app.fabrica();
+            
+        // para test seteo catastrofe 1 al inicio
+        window.localStorage.setItem("appCatastrofe", 1);
         app.refresh();
         app.checkSesion();
         //app.checkSesion();
@@ -70,15 +75,17 @@ var app = {
 
     lanzarSesion: function(){
         //quito la imagen de load
+        //alert('en lanzar'); 
         $('#load').addClass("delete");
+        $('#menuboton').addClass("novisible");
 
         if(app.email ==null){ // no hay sesion
             $('#map').addClass("mapFondo");
-            $('#menuboton').addClass("novisible");
-        }
-        else{
             
-            $('#map').removeClass("mapFondo");
+        }
+        else{                        
+            var evento='login';
+            app.dom(evento);
         }
 
         //app.mandarJquery();
@@ -99,6 +106,11 @@ var app = {
 
     createTable: function() {
         var db = app.db;
+
+        db.transaction(function(tx) {
+            tx.executeSql("CREATE TABLE IF NOT EXISTS catastrofe(ID INTEGER PRIMARY KEY ASC, id TEXT, nombre TEXT, latitud TEXT, longitud TEXT, planRiesgo TEXT, planEmergencia TEXT)", []);
+        });
+
         db.transaction(function(tx) {
             tx.executeSql("CREATE TABLE IF NOT EXISTS todo(ID INTEGER PRIMARY KEY ASC, todo TEXT, added_on DATETIME)", []);
         });
@@ -136,9 +148,27 @@ var app = {
         });
     },
 
+    setAppCatastrofe: function(id){
+        //alert('setAppCatastrofe ' + id);
+        window.localStorage.setItem("appCatastrofe", id);
+        app.refresh();
+        
+    },
+
     refresh: function() {
         var renderTodo = function (row) {
-            return "<li>" + "<div class='todo-check'></div>" + row.todo + "<a class='button delete' href='javascript:void(0);'  onclick='app.deleteTodo(" + row.ID + ");'><p class='todo-delete'></p></a>" + "<div class='clear'></div>" + "</li>";
+            var seleccionada = window.localStorage.getItem("appCatastrofe");
+            //alert('seleccionada ' + seleccionada);
+            var seleccionada ="todo_"+seleccionada;
+            var comparo  = "todo_"+row.ID
+            //alert('seleccionada '+ seleccionada +' comparo '+ comparo);
+            if(seleccionada == comparo){
+                return "<li"+" id=todo_"+row.ID+" onclick='app.setAppCatastrofe(" + row.ID + ");' >" + "<div class='todo-check'></div>" + 'row id: '+ row.ID + row.todo + "<a class='button delete' href='javascript:void(0);'  onclick='app.deleteTodo(" + row.ID + ");'><p class='todo-delete'></p></a>" + "<div class='clear'></div>" + "</li>";
+            }
+            else{
+                return "<li"+" id=todo_"+row.ID+" onclick='app.setAppCatastrofe(" + row.ID + ");'>" + '   row id: '+ row.ID + row.todo + "<a class='button delete' href='javascript:void(0);'  onclick='app.deleteTodo(" + row.ID + ");'><p class='todo-delete'></p></a>" + "<div class='clear'></div>" + "</li>";   
+            }
+
         }
         
         var render = function (tx, rs) {
@@ -176,6 +206,7 @@ var app = {
         
         // mando las acciones a los distintos botones o divs
         app.mandarJquery();
+
         }
         
         var db = app.db;
@@ -334,20 +365,108 @@ var app = {
 
     },
     noCerrar: function(noCerrarSesion, email){
-        //alert('testf , noCerrarSesion: ' + noCerrarSesion);
+        alert('testf , noCerrarSesion: ' + noCerrarSesion);
         if(noCerrarSesion===1){
-          //  alert('clavo registro');
+            alert('clavo registro');
             app.addSesion(email);
         }
     },
 
-    mandarJquery: function(){
-        //alert('retorno 1 ');
+    dom: function(evento){
+        if(evento==="login"){
+            $('#load').addClass("delete"); // no la voy a precisar mas
+            $("#formIngresar").addClass("derecha");
+            $('#map').removeClass("mapFondo");
+            $('#menuboton').addClass("visible");
+        }
+        
+        if(evento==="catastrofes"){
+            $('#sqlite').addClass("visible");
+            $('#menuoffcanvas').removeClass("in canvas-slid");
+        }
 
+
+    },
+
+    login: function(){
+        var idUsuario = 0;
+        // valores input
+        var email = document.getElementById("inputEmail").value;
+        var password = document.getElementById("inputPassword").value;
+        var noCerrarSesion = $( "input:checked" ).length; // si n = 1 , entonces no cerrar sesion
+        // llamo al servicio 
+
+        
+        if(email==="hernan@gmail.com" && password==="test") idUsuario =1;
+
+        if(idUsuario===0) alert('Credenciales invalidas, intente de nuevo');
+        else{
+            if(idUsuario<0) alert('Se produjo un error, intente de nuevo');
+            else{
+                app.noCerrar(noCerrarSesion,email);
+                window.localStorage.setItem("idUsuario", idUsuario);
+                //window.localStorage.setItem("password", password);
+
+                var evento='login';
+                app.dom(evento);
+                
+
+            }
+
+        }
+    },
+
+    fabrica: function(){ //data puedo pasarlo por parametro
+        var data = [{"id":"856","nombre":"Sudestada en el cerro", "latitud":"-34.887177", "longitud":"-56.251874"
+         ,"planRiesgo":"https://eva.fing.edu.uy/pluginfile.php/76827/mod_resource/content/4/Tutorial%20Docente%20EVA%20.FIng%202.5.pdf"
+         ,"planEmergencia":"https://eva.fing.edu.uy/pluginfile.php/76828/mod_resource/content/3/Tutorial%20Estudiantes.pdf" },
+        {"id":"900","nombre":"Tsunami en Colonia", "latitud":"-34.469197", "longitud":"-57.810511"
+         ,"planRiesgo":"https://eva.fing.edu.uy/pluginfile.php/76827/mod_resource/content/4/Tutorial%20Docente%20EVA%20.FIng%202.5.pdf"
+         ,"planEmergencia":"https://eva.fing.edu.uy/pluginfile.php/76828/mod_resource/content/3/Tutorial%20Estudiantes.pdf" },
+        {"id":"1025","nombre":"Tornado cerca de Mariscala", "latitud":"-34.040777", "longitud":"-54.788166"
+         ,"planRiesgo":"https://eva.fing.edu.uy/pluginfile.php/76827/mod_resource/content/4/Tutorial%20Docente%20EVA%20.FIng%202.5.pdf"
+         ,"planEmergencia":"https://eva.fing.edu.uy/pluginfile.php/76828/mod_resource/content/3/Tutorial%20Estudiantes.pdf" }
+        ];
+        
+        $.each(data, function(i, obj) {
+          //use obj.id and obj.name here, for example:
+          alert(obj.nombre);
+        });
+    
+
+    },
+
+    mandarJquery: function(){
+       
         $(document).ready(function() {
             // menu 
             //$('.navmenu').offcanvas()
 
+            $( "#aCatastrofes").click(function(){
+                app.dom('catastrofes');
+            });
+            
+            // test llamada
+            $( "#aRetorno").click(function(){
+                $("#todoItems li").each(function() {
+                    alert('clickeaste a li + this ' + $(this).attr('id') );
+                });
+            });
+            
+            // $("#todoItems li").each(function() {
+            //     var selector = $(this).attr('id');
+            //     //$(this).attr('id').click(function(){
+            //     $("#"+selector).click(function(){
+            //         app.setAppCatastrofe(selector);
+            //     });
+            // });
+            
+               
+            
+
+            // $("li").click(function(){
+            //     alert('clickeaste a li + this ' + $(this).attr('id') );
+            // });
 
             //$("#formIngresar").addClass("pageLogin");
             $("#loading").addClass("novisible");
@@ -371,21 +490,15 @@ var app = {
                 //navigator.app.exitApp();
             });
 
-             $( "#aRetorno").click(function(parmretorno, retorno){
-                alert('parmretorno: ' + parmretorno + ' retorno: ' + retorno + ' app.email: ' + app.email);
-                //navigator.app.exitApp();
-            }); 
+            
 
 
             // login de rescatista
             $( "#login").click(function(){
 
-
-                // var email = document.getElementById("inputEmail").value;
-                // var password = document.getElementById("inputPassword").value;
-                // var noCerrarSesion = $( "input:checked" ).length; // si n = 1 , entonces no cerrar sesion
-                // alert("email: " + email + " ,password: " + password + " ,nocerrar: " + noCerrarSesion);
-                //alert("app.regid " + app.regid);
+                app.login();
+                
+                //app.iterate(data);
                 
 
                 // var urljson = "http://172.16.108.196:8080/catastrophes-system-web/rest/ServicesUsuario/get";
@@ -395,16 +508,17 @@ var app = {
                 //   console.log("lgh 2" + data);
                 // });
 
-                $.ajax({
-                    url: "http://172.16.108.196:8080/catastrophes-system-web/rest/ServicesUsuario/get"
-                }).then(function(data) {
-                    console.log('lgh en llamoRest dentro del .then');
-                    alert(data);
-                });
+                
+                //alert('voy a llamar ');
+                // $.ajax({
+                //     url: "http://172.16.108.196:8080/catastrophes-system-web/rest/ServicesUsuario/get"
+                // }).then(function(data) {
+                //     console.log('lgh en llamoRest dentro del .then');
+                //     alert(data);
+                // });
 
                 //app.noCerrar(noCerrarSesion,email);
                 
-
                 //$("#formIngresar").addClass("derecha");
                 //var mapa = document.getElementById("map");
                 //mapa.style.display = "none";
