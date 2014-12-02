@@ -18,9 +18,9 @@ module.exports = [
 module.exports.metadata = 
 // TOP OF METADATA
 {
-    "org.apache.cordova.geolocation": "0.3.10",
     "com.phonegap.plugins.PushPlugin": "2.4.0",
-    "com.brodysoft.sqlitePlugin": "1.0.3"
+    "com.brodysoft.sqlitePlugin": "1.0.3",
+    "org.apache.cordova.geolocation": "0.3.10"
 }
 // BOTTOM OF METADATA
 });

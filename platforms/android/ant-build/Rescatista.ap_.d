@@ -46,6 +46,7 @@
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/plugins \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/spec.html \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/config.xml \
+/home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/indexOri.html \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/res/icon \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/res/screen \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/res/icon/bada \
@@ -126,6 +127,7 @@
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/spec/lib/jasmine-1.2.0/jasmine-html.js \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/js/jasny-bootstrap.min.js \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/js/fastclick.js \
+/home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/js/md5.min.js \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/js/index.js \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/js/node_modules \
 /home/hernan/phonegap/projects/rescatista/platforms/android/assets/www/js/npm-debug.log \

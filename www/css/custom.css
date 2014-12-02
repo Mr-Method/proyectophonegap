@@ -29,6 +29,12 @@
   padding: 5px;*/
 }
 
+.amenu:active{
+	background-color: #b2b2b2;
+}
+
+
+
 .mapFondo{
 	z-index: -2;
 	opacity: 0.1;
@@ -135,14 +141,21 @@
 	top: -100px;
 }
 
+.alfrente{
+	z-index: 10;
+}
 
 #loading {
   /*height: 400px;
   position: relative;
   background-color: gray;  for demonstration */
-
+  	/*width: 150px;
+  	height: 150px;*/
+	position: absolute;
+	/*
 	position: relative;
-	/*display:block;*/
+	display:block;
+	*/
 	margin-left: 50%;
 	margin-top: 50%;
 	z-index: 2;

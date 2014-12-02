@@ -13,8 +13,7 @@ var app = {
         document.addEventListener('deviceready', this.onDeviceReady, false);
         //document.addEventListener('deviceready', this.onDeviceReady, false);
         document.addEventListener("menubutton", this.menu, false);
-
-        //document.addEventListener('deviceready', init, false);
+        //document.addEventListener("backbutton", backButton, false);
 
     },
     menu: function(){
@@ -26,36 +25,20 @@ var app = {
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
         //app.receivedEvent('deviceready');
-        
-
+        app.backButtonAccion = 'salir';
         app.getLocation();
         //app.seePosition();
         app.openDb();
         app.createTable();
-
+        //app.deleteCatastrofe(); borro si sucsess al bajar la data por web service
+        app.checkSesion();
         app.fabrica();
             
-        // para test seteo catastrofe 1 al inicio
-        window.localStorage.setItem("appCatastrofe", 1);
-        app.refresh();
-        app.checkSesion();
-        //app.checkSesion();
-
+        
         
         app.receivedEvent('deviceready');
         var pushNotification = window.plugins.pushNotification;
         pushNotification.register(app.successHandler, app.errorHandler,{"senderID":"466388852109","ecb":"app.onNotificationGCM"});
-    
-        
-        //app.mandarJquery();
-        
-        //estas lineas son las que serian la function init del ejemplo sqlite
-        //navigator.splashscreen.hide(); la saque porque explota
-        //---> base local sqlite
-        
-        //alert('chequeo: ' + chequeo + ' / app.email: ' + app.email);
-
-        
 
 
     },
@@ -81,7 +64,7 @@ var app = {
 
         if(app.email ==null){ // no hay sesion
             $('#map').addClass("mapFondo");
-            
+            $('#formIngresar').addClass("visible");
         }
         else{                        
             var evento='login';
@@ -108,7 +91,7 @@ var app = {
         var db = app.db;
 
         db.transaction(function(tx) {
-            tx.executeSql("CREATE TABLE IF NOT EXISTS catastrofe(ID INTEGER PRIMARY KEY ASC, id TEXT, nombre TEXT, latitud TEXT, longitud TEXT, planRiesgo TEXT, planEmergencia TEXT)", []);
+            tx.executeSql("CREATE TABLE IF NOT EXISTS catastrofe(ID INTEGER PRIMARY KEY ASC, idC TEXT, nombre TEXT, latitud TEXT, longitud TEXT, planRiesgo TEXT, planEmergencia TEXT)", []);
         });
 
         db.transaction(function(tx) {
@@ -131,12 +114,25 @@ var app = {
         });
     },
       
+    addCatastrofe: function(idCText, nombreText, latitudText, longitudText, planRiesgoText, planEmergenciaText ) {
+        var db = app.db;
+        db.transaction(function(tx) {
+            var addedOn = new Date();         
+            tx.executeSql("INSERT INTO catastrofe(idC, nombre, latitud, longitud, planRiesgo, planEmergencia ) VALUES (?,?,?,?,?,?)",
+                          [idCText, nombreText, latitudText, longitudText, planRiesgoText, planEmergenciaText],
+                          app.onSuccess,
+                          app.onError);
+        });
+    },
+
     onError: function(tx, e) {
         console.log("Error: " + e.message);
     },
       
     onSuccess: function(tx, r) {
-        app.refresh();
+        //app.refresh();
+        console.log('lgh on success');
+        //app.refreshCatastrofe();
     },
       
     deleteTodo: function(id) {
@@ -148,10 +144,50 @@ var app = {
         });
     },
 
+    deleteCatastrofe: function(id) {
+        console.log('lgh en deleteCatastrofe');
+        var db = app.db;
+        db.transaction(function(tx) {
+            //tx.executeSql("DELETE FROM catastrofe WHERE ID=?", [id],
+            tx.executeSql("DELETE FROM catastrofe", [],
+                          app.onSuccess,
+                          app.onError);
+        });
+    },
+
     setAppCatastrofe: function(id){
-        //alert('setAppCatastrofe ' + id);
         window.localStorage.setItem("appCatastrofe", id);
-        app.refresh();
+        app.refreshCatastrofe();
+        console.log('lgh en setAppCatastrofe id: ' + id);
+// nombres de los campos de la tabla: catastrofe        
+//idC, nombre, latitud, longitud, planRiesgo, planEmergencia
+        var setCatastrofeAtributos = function (tx, rs) {
+            for (var i = 0; i < rs.rows.length; i++) {
+                //console.log(rs.rows.item(i).planRiesgo);
+                app.nombre = rs.rows.item(i).nombre;
+                app.planRiesgo = rs.rows.item(i).planRiesgo;
+                app.planEmergencia = rs.rows.item(i).planEmergencia;
+                app.latitud = rs.rows.item(i).latitud;
+                app.longitud= rs.rows.item(i).longitud;
+                var hrefRiesgo =  app.planRiesgo;
+                var hrefEmergencia =  app.planEmergencia;
+                $("#planriesgo").attr("href", hrefRiesgo);
+                $("#planemergencia").attr("href", hrefEmergencia);
+                //"https://drive.google.com/viewerng/viewer?url=https://eva.fing.edu.uy/pluginfile.php/76828/mod_resource/content/3/Tutorial%2520Estudiantes.pdf";//app.planRiesgo;
+                //$("#planriesgo").attr("href", app.planRiesgo);
+                //$("#planriesgo").attr("href","https://drive.google.com/viewerng/viewer?url=https://eva.fing.edu.uy/pluginfile.php/76828/mod_resource/content/3/Tutorial%2520Estudiantes.pdf");
+                //$("#planriesgo").attr("href", hrefRiesgo);
+                //$("#planriesgo").prop("href", rs.rows.item(i).planRiesgo);
+            }
+        }
+
+        var db = app.db;
+
+        db.transaction(function(tx) {
+            tx.executeSql("SELECT * FROM catastrofe WHERE ID=?", [id],
+                          setCatastrofeAtributos,
+                          app.onError);
+        });
         
     },
 
@@ -184,6 +220,47 @@ var app = {
         var db = app.db;
         db.transaction(function(tx) {
             tx.executeSql("SELECT * FROM todo", [], 
+                          render, 
+                          app.onError);
+        });
+    },
+
+    refreshCatastrofe: function() {
+        var renderCatastrofe = function (row) {
+            var seleccionada = window.localStorage.getItem("appCatastrofe");
+            //console.log('seleccionada ' + seleccionada);
+            var seleccionada ="cat_"+seleccionada;
+            var comparo  = "cat_"+row.ID
+            console.log('seleccionada '+ seleccionada +' comparo '+ comparo);
+            if(seleccionada == comparo){
+                return "<li"+" id=cat_"+row.ID+" onclick='app.setAppCatastrofe(" + row.ID + ");' >" + "<div class='todo-check'></div>" + 'row id: '+ row.ID + row.nombre + "<a class='button delete' href='javascript:void(0);'  onclick='app.deleteTodo(" + row.ID + ");'><p class='todo-delete'></p></a>" + "<div class='clear'></div>" + "</li>";
+            }
+            else{
+                return "<li"+" id=cat_"+row.ID+" onclick='app.setAppCatastrofe(" + row.ID + ");'>" + '   row id: '+ row.ID + row.nombre + "<a class='button delete' href='javascript:void(0);'  onclick='app.deleteTodo(" + row.ID + ");'><p class='todo-delete'></p></a>" + "<div class='clear'></div>" + "</li>";   
+            }
+
+        }
+        
+        var render = function (tx, rs) {
+            //alert('en render');
+            //lengthRows = rs.rows.length
+            //console.log('lgh en resfreshCatastrofe lengthRows '+lengthRows);
+            var rowOutput = "";
+            var catastrofeItems = document.getElementById("catastrofeItems");
+            for (var i = 0; i < rs.rows.length; i++) {
+                rowOutput += renderCatastrofe(rs.rows.item(i));
+                //alert('q paso ' + rs.rows.length );
+                console.log('lgh en resfreshCatastrofe rowOutput '+rowOutput);
+            }
+          //todoItems.innerHTML = rowOutput;
+          catastrofeItems.innerHTML = rowOutput;
+          
+            
+        }
+        
+        var db = app.db;
+        db.transaction(function(tx) {
+            tx.executeSql("SELECT * FROM catastrofe", [], 
                           render, 
                           app.onError);
         });
@@ -266,22 +343,62 @@ var app = {
               break;
         }
     },
+
+    addCatastrofeLocation: function(){
+        var map = app.map;
+        var lat = app.latitud;
+        var lon = app.longitud;
+        var boundLat = null;
+        var boundLon = null;
+
+        var rescatistaLat = window.localStorage.getItem("rescatistaLat");
+        var rescatistaLon =window.localStorage.getItem("rescatistaLon");
+
+        var circle = L.circle([lat, lon], 500, {
+                        color: 'red',
+                        fillColor: '#f03',
+                        fillOpacity: 0.5
+                    }).addTo(map).bindPopup(app.nombre).openPopup();
+        
+        
+        //var catastrofeLat = -33.928769;
+        //var catastrofeLon = -55.161164;
+        // test bounds
+        // map.fitBounds([
+        //     [catastrofeLat, catastrofeLon],
+        //     [-31.774, -53.1231]
+        // ]);
+
+        app.dom('addCatastrofeLocation');
+    },
+
     // geolocation plugin
+    // http://stackoverflow.com/questions/23383750/phonegap-geolocation-sometimes-not-working-on-android
     getLocation: function(){
         var onSuccess = function(position) { // es el codigo de la funcion leaflet
             var lat = position.coords.latitude;
             var lon = position.coords.longitude;
+            window.localStorage.setItem("rescatistaLat", lat);
+            window.localStorage.setItem("rescatistaLon", lon);
+
             var map = L.map('map').setView([lat, lon], 13);
-            // add an OpenStreetMap tile layer
-            L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
+//             add an OpenStreetMap tile layer --->>> DEJO DE ANDAR!!!!
+//             L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+//                 attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+//             }).addTo(map);
+// nuevlo tileLayer
+            
+            L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
+            {    maxZoom: 18  }).addTo(map);
+
             // add a marker in the given location, attach some popup content to it and open the popup
             L.marker([lat, lon]).addTo(map)
                 .bindPopup('Posición Aproximada') 
                 .openPopup();
 
-        };
+            app.map = map;
+
+        }
 
         // onError Callback receives a PositionError object
         function onError(error) {
@@ -305,12 +422,16 @@ var app = {
             //                     '<hr />'      + element.innerHTML;
             var lat = position.coords.latitude;
             var lon = position.coords.longitude;
-            
+
             var map = L.map('map').setView([lat, lon], 5);// original pasaba 13 en vez de 5, no cambia nada
-            // add an OpenStreetMap tile layer
-            L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
+            // add an OpenStreetMap tile layer --->>> DEJO DE ANDAR!!!!
+            // L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+            //     attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+            // }).addTo(map);
+// nuevlo tileLayer            
+            L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
+            {    maxZoom: 18  }).addTo(map);
+
             // add a marker in the given location, attach some popup content to it and open the popup
             L.marker([lat, lon]).addTo(map)
                 .bindPopup('Posición Aproximada') 
@@ -353,7 +474,7 @@ var app = {
 
         var mostrarEmail = function (tx, rs) {
             for (var i = 0; i < rs.rows.length; i++) {
-                alert('el select en i: '+ i +' '+ rs.rows.item(i).email);
+                //alert('el select en i: '+ i +' '+ rs.rows.item(i).email);
             }
         }
 
@@ -365,9 +486,9 @@ var app = {
 
     },
     noCerrar: function(noCerrarSesion, email){
-        alert('testf , noCerrarSesion: ' + noCerrarSesion);
+        //alert('testf , noCerrarSesion: ' + noCerrarSesion);
         if(noCerrarSesion===1){
-            alert('clavo registro');
+            //alert('clavo registro');
             app.addSesion(email);
         }
     },
@@ -375,14 +496,22 @@ var app = {
     dom: function(evento){
         if(evento==="login"){
             $('#load').addClass("delete"); // no la voy a precisar mas
-            $("#formIngresar").addClass("derecha");
+            //$("#formIngresar").addClass("derecha");
+            //$("#formIngresar").addClass("novisible");
             $('#map').removeClass("mapFondo");
             $('#menuboton').addClass("visible");
         }
         
         if(evento==="catastrofes"){
-            $('#sqlite').addClass("visible");
+            $('#listCatastrofe').addClass("visible");
             $('#menuoffcanvas').removeClass("in canvas-slid");
+            //document.addEventListener("backbutton", function(){$('#listCatastrofe').removeClass("visible");}, false);
+        }
+
+        if(evento==="addCatastrofeLocation"){
+            $('#menuoffcanvas').removeClass("in canvas-slid");
+            $('#listCatastrofe').removeClass("visible");
+            //document.addEventListener("backbutton", function(){$('#listCatastrofe').removeClass("visible");}, false);
         }
 
 
@@ -392,47 +521,102 @@ var app = {
         var idUsuario = 0;
         // valores input
         var email = document.getElementById("inputEmail").value;
-        var password = document.getElementById("inputPassword").value;
+        // var password = document.getElementById("inputPassword").value;
         var noCerrarSesion = $( "input:checked" ).length; // si n = 1 , entonces no cerrar sesion
         // llamo al servicio 
 
-        
-        if(email==="hernan@gmail.com" && password==="test") idUsuario =1;
+        //var url = "http://192.168.1.41:8080/catastrophes-system-web/rest/ServicesRescatista/login";
+        var url = "http://"+app.hostservidor+":8080/catastrophes-system-web/rest/ServicesRescatista/login";
+        var form = $("#formLogin").serialize();
+        var idUsuario;
+        $.ajax({ 
+            type: "GET",
+            data: form,
+            url: url,
+            contentType: "application/json",//; charset=utf-8",
+            dataType: "json",
+            crossDomain: true,
+            //cache: false,
+            timeout: 20 * 1000,
+            success:function(response)
+            {   
+                idUsuario = response.login;
+                console.log('lgh login success ' + JSON.stringify(response)) ;
 
-        if(idUsuario===0) alert('Credenciales invalidas, intente de nuevo');
-        else{
-            if(idUsuario<0) alert('Se produjo un error, intente de nuevo');
-            else{
-                app.noCerrar(noCerrarSesion,email);
-                window.localStorage.setItem("idUsuario", idUsuario);
-                //window.localStorage.setItem("password", password);
-
-                var evento='login';
-                app.dom(evento);
-                
-
+                if(idUsuario==0) alert('Credenciales invalidas, intente de nuevo');
+                else{
+                    if(idUsuario<0) alert('Se produjo un error, intente de nuevo');
+                    else{
+                        app.noCerrar(noCerrarSesion,email);
+                        window.localStorage.setItem("idUsuario", idUsuario);
+                        //window.localStorage.setItem("password", password);
+                        var evento='login';
+                        app.dom(evento);
+                    }
+                }
+                // if(!timeOutOccured){
+                //     clearTimeout(timeOutInteger);
+                //     onlineFunction();
+                // }
+            },
+             error: function(xhr, textStatus, errorThrown) {
+                alert('Se produjo un error: ' + errorThrown );
+                  //  + ( errorThrown ? errorThrown : 
+                //xhr.status );
             }
+        });
 
-        }
     },
 
     fabrica: function(){ //data puedo pasarlo por parametro
-        var data = [{"id":"856","nombre":"Sudestada en el cerro", "latitud":"-34.887177", "longitud":"-56.251874"
-         ,"planRiesgo":"https://eva.fing.edu.uy/pluginfile.php/76827/mod_resource/content/4/Tutorial%20Docente%20EVA%20.FIng%202.5.pdf"
-         ,"planEmergencia":"https://eva.fing.edu.uy/pluginfile.php/76828/mod_resource/content/3/Tutorial%20Estudiantes.pdf" },
-        {"id":"900","nombre":"Tsunami en Colonia", "latitud":"-34.469197", "longitud":"-57.810511"
-         ,"planRiesgo":"https://eva.fing.edu.uy/pluginfile.php/76827/mod_resource/content/4/Tutorial%20Docente%20EVA%20.FIng%202.5.pdf"
-         ,"planEmergencia":"https://eva.fing.edu.uy/pluginfile.php/76828/mod_resource/content/3/Tutorial%20Estudiantes.pdf" },
-        {"id":"1025","nombre":"Tornado cerca de Mariscala", "latitud":"-34.040777", "longitud":"-54.788166"
-         ,"planRiesgo":"https://eva.fing.edu.uy/pluginfile.php/76827/mod_resource/content/4/Tutorial%20Docente%20EVA%20.FIng%202.5.pdf"
-         ,"planEmergencia":"https://eva.fing.edu.uy/pluginfile.php/76828/mod_resource/content/3/Tutorial%20Estudiantes.pdf" }
-        ];
-        
-        $.each(data, function(i, obj) {
-          //use obj.id and obj.name here, for example:
-          alert(obj.nombre);
+        var setCatastrofeYRefresh = function(){
+            // tomo la ultima catastrofe elegida del localstorage
+            var seleccionada = window.localStorage.getItem("appCatastrofe");
+            app.setAppCatastrofe(seleccionada); 
+            app.refreshCatastrofe();
+            /*  para el id
+                tomarlo del localstorage
+                sino hay traer de la base
+                sino alertar */
+        }
+
+        //var url = "http://192.168.1.41:8080/catastrophes-system-web/rest/ServicesRescatista/catastrofes";
+        var url = "http://"+app.hostservidor+":8080/catastrophes-system-web/rest/ServicesRescatista/catastrofes";
+        $.ajax({ 
+            type: "GET",
+            //data: form,
+            url: url,
+            contentType: "application/json",//; charset=utf-8",
+            dataType: "json",
+            crossDomain: true,
+            //cache: false,
+            timeout: 20 * 1000,
+            success:function(data)
+            {   
+                app.deleteCatastrofe();
+
+                $.each(data, function(i, obj) {
+                  //use obj.id and obj.name here, for example:
+                  console.log('lgh llamando addCatastrofe para '+obj.nombre);
+                  app.addCatastrofe(obj.idC, obj.nombre, obj.latitud, obj.longitud, obj.planRiesgo, obj.planEmergencia );
+                });
+                
+                setCatastrofeYRefresh();
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                setCatastrofeYRefresh();
+                alert('Se produjo un error al actualizar catastrofes: ' + errorThrown );
+            }
         });
-    
+
+
+    },
+
+    backButton: function(){
+        if(app.backButtonAccion =='salir')
+            navigator.app.exitApp();
+        if(app.backButtonAccion =='quitarLoading')
+            $("#loading").removeClass("alfrente");
 
     },
 
@@ -441,15 +625,47 @@ var app = {
         $(document).ready(function() {
             // menu 
             //$('.navmenu').offcanvas()
+            //$("#planriesgo").attr("href","https://drive.google.com/viewerng/viewer?url=https://eva.fing.edu.uy/pluginfile.php/76828/mod_resource/content/3/Tutorial%2520Estudiantes.pdf");
+            // $("#planriesgo").click(function(){
+            //     alert(app.planRiesgo);
+            // });
 
-            $( "#aCatastrofes").click(function(){
+            $("#aCatastrofes").click(function(){
                 app.dom('catastrofes');
             });
             
             // test llamada
             $( "#aRetorno").click(function(){
-                $("#todoItems li").each(function() {
-                    alert('clickeaste a li + this ' + $(this).attr('id') );
+                //alert('aretorno');
+                // $("#catastrofeItems li").each(function() {
+                //  :8080/http://catastrophes-system-web/rest/ServicesUsuario/get   alert('clickeaste a li + this ' + $(this).attr('id') );
+                // });
+                //var url = "http://192.168.1.41:8080/catastrophes-system-web/rest/ServicesUsuario/get";
+                var url = "http://"+app.hostservidor+":8080/catastrophes-system-web/rest/ServicesUsuario/get";
+                //var url = "http://172.16.108.196:8080/catastrophes-system-web/rest/ServicesUsuario/get";
+                $.ajax({ 
+                    type: "GET",
+                    //data: "{}",
+                    url: url,
+                    contentType: "application/json",//; charset=utf-8",
+                    dataType: "json",
+                    crossDomain: true,
+                    //cache: false,
+                    timeout: 20 * 1000,
+                    success:function(response)
+                    {   
+                        console.log('lgh success ' + response) ;
+                        alert('response: ' + response.llave);
+                        // if(!timeOutOccured){
+                        //     clearTimeout(timeOutInteger);
+                        //     onlineFunction();
+                        // }
+                    },
+                     error: function(xhr, textStatus, errorThrown) {
+                        alert('An error occurred! ' + errorThrown );
+                          //  + ( errorThrown ? errorThrown : 
+                        //xhr.status );
+                    }
                 });
             });
             
@@ -490,61 +706,36 @@ var app = {
                 //navigator.app.exitApp();
             });
 
-            
+            /*
+            $("#planriesgo").click(function(){
+                $("#loading").addClass("alfrente");
+                app.backButtonAccion('quitarLoading');
+            });
+
+            $("#planemergencia").click(function(){
+                $("#loading").addClass("alfrente");
+                app.backButtonAccion('quitarLoading');
+            });
+            */                
 
 
             // login de rescatista
-            $( "#login").click(function(){
-
+            $( "#login").click(function(event){
+                event.preventDefault();
                 app.login();
                 
-                //app.iterate(data);
-                
-
-                // var urljson = "http://172.16.108.196:8080/catastrophes-system-web/rest/ServicesUsuario/get";
-                // $.getJSON(urljson , function( data ) {
-                //   //alert("user: " + data.User + "password: "+ data.password);
-                //   alert(data);
-                //   console.log("lgh 2" + data);
-                // });
-
-                
-                //alert('voy a llamar ');
-                // $.ajax({
-                //     url: "http://172.16.108.196:8080/catastrophes-system-web/rest/ServicesUsuario/get"
-                // }).then(function(data) {
-                //     console.log('lgh en llamoRest dentro del .then');
-                //     alert(data);
-                // });
-
-                //app.noCerrar(noCerrarSesion,email);
-                
-                //$("#formIngresar").addClass("derecha");
-                //var mapa = document.getElementById("map");
-                //mapa.style.display = "none";
-                //$("h2.form-signin-heading").addClass("derecha");
-                //$( "#formIngresar").children().addClass("derecha");
-                //$("#formIngresar").addClass("novisible");
             });
             
 
             $( "#btn2").click(function(){
-                //alert("hola");
-                //var mapa = document.getElementById("map");
-                //mapa.style.display = "none";
+                
                 $("#map").addClass("derecha");
 
-                //$("#formIngresar").addClass("derecha");
-                //$("#formIngresar").addClass("novisible");
             });
 
 
             $( ".menu").click(function(){
                 mandarderecha();
-                //var divsqlite = document.getElementById("sqlite");
-                //divsqlite.style.display = "none";
-                //divsqlite.addClass("derecha");
-                //alert('boton 1');
             });// end - $( "btn1").click(function(){
             
             $( ".menu1").click(function(){
@@ -555,17 +746,6 @@ var app = {
 
             $( "#callrest").click(function(){
                 console.log('lgh 1 entre');
-                //alert('clickeaste');
-                
-                //This is a shorthand Ajax function, which is equivalent to
-                /*$.ajax({
-                  dataType: "json",
-                  url: url,
-                  data: data,
-                  success: success
-                });
-                */
-
                 //var idUsuario = document.getElementById("inputEmail3").value;
                 //var password = document.getElementById("inputPassword3").value;
                 //var idUsuario = $("#inputEmail3").val();
@@ -619,9 +799,20 @@ var app = {
     
 };
 
+app.hostservidor = "192.168.1.42";
+app.map = null; 
+
 app.email = null; // sesion
 
 app.regid = null;
+
+app.nombre = null;
+app.planRiesgo = null;
+app.planEmergencia = null;
+app.latitud = null;
+app.longitud= null;
+
+app.backButtonAccion= null;
 
 // del ejemplo sqlite
 app.db = null;
